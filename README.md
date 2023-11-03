@@ -13,51 +13,20 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
 ## More about this Project
 
-### Cultivate
+This carbon calculator is a refined version of the methodology found at [Sustainable Web Design](https://sustainablewebdesign.org/calculating-digital-emissions/).
 
-Cultivate is a high-fidelity prototyping tool for UX and UI designers and developers.
+Specifically, it only uses the two system segments; Consumer device use and Network use, ignoring the data centre use and hardware production. This is intended to bring focus to the User Interface emissions to establish a metric for measuring the emissions of a website or application during it's use. This should help drive design and development to make choices that reduce the energy use and the CO2e emissions.
 
-It provides designers and developers with a web application template to rapidly design, build, and test user interfaces with all the benefits of a native web browser.
+The metric used for measuring energy use `0.5346 kWh/GB`. Combined with the Carbon factor of the energy source, the emissions are calculated.
 
-#### Design with Code
+## How To Use This Calculator
 
-Designing in code instead of the usual design tools, such as Figma, Sketch, Adobe XD, etc., provides many benefits.
+The calculator enables you to provide the uncached and cached transfered data (obtained using Chrome dev tools, for example). Either by estimating, or where possible providing the percentage of new (vs returning) visitors, the calculator will use this with the cached and uncached data transfers and the 0.5346kWh/GB metric to calculate the total energy per vist, which can be seen in the expanded detail.
 
-- A native web experience - see, demo, and test how a design works in the browser.
-- Native browser UI elements and interactivity, such as form inputs and buttons.
-- A common and standard language between designers and developers. With plenty of online and within-company support and the W3C standards and guidelines to follow.
-- Ability to publish, share, and test designs easily.
-- Ability to collaboratively work on projects with version control.
-- Easy to integrate and work with mock, sample, or even actual data to populate screens.
-- Design for and test accessibility with screen reader technology and keyboard interaction.
-- Design for and test responsive screen sizing and device simulation.
-- Rapid iteration and progressive elaboration.
+Providing a number of users per month (estimated, or obtained otherwise) and the energy grid source a final estimated value of CO2e emissions can be calculated.
 
-#### Technology Stack
+Of course these numbers are all based on many, many variables and assumptions and should only used for guidance and setting a benchmark to work from and improve.
 
-The Cultivate app is built on the Next.js system, extending the React UI library and supported by a utility-first CSS framework - TailwindCSS. Additionally, a headless (unstyled) component library - Radix UI Primitives, provide reusable components such as dropdowns, modals, and popovers.
-
-The Cultivate template provides an skeleton application enabling designers and developers to quickly run a local pre-configured application for designing and building user interfaces.
-
-For more information, check out the technology documentation:
-
-- [Next.js](https://nextjs.org/)
-- [React](https://react.dev/)
-- [TailwindCSS](https://tailwindcss.com/)
-- [Radix UI](https://www.radix-ui.com/primitives)
-
-#### An Unopinionated Framework
-
-What is an "unopinionated" framework?
-
-Most UI libraries and frameworks impose styling of UI elements - these are opinionated design systems. Though they are great for quickly building interfaces without the need to think about and apply your styles, they also restrict creativity and design, pigeonholing and directing designers. These opinionated systems usually provide theming options and style overrides, but often only to a point. Further customisation, especially concerning interactions and animations, requires more complex manipulation and hacking of the existing components.
-
-Cultivate provides a framework without design constraints and limitations - removed of opinion. Yet it provides the tools and accessibility to designers to freely explore, trial, and apply styles and interactions as they design the interface.
-
-Being an unopinionated framework - Cultivate puts the designers in control.
-
-However... Radix UI has recently released a [Themes](https://www.radix-ui.com/) library built on the Radix UI Primitive components. It provides basic custom theming options for jumping quickly into building a UI without the effort required to determine styling. There is potentially some conflict with TailwindCSS, so proceed with caution.
+The methodology may evolve over time as more accurate and updated metrics become available. These will be clearly indicated as this happens.
