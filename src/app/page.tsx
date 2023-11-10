@@ -33,16 +33,28 @@ export default function RootPage() {
     carbon_factor: carbonFactor[0].value,
     energy_model: EpGB_options[0].value,
     number_of_visits: 1000,
+    plu_unit: "MB",
+    plc_unit: "MB",
   });
 
   // Expanding details
   const [expand, setExpand] = useState(false);
 
   // Page load uncached (new visit) (GB)
-  let pageUncachedGb = inputs.page_uncached / 1000;
+  let pageUncachedGb =
+    inputs.plu_unit === "GB"
+      ? inputs.page_uncached // per the input, no need to convert to GB
+      : inputs.plu_unit === "MB" // if unit is MB
+      ? inputs.page_uncached / 1000 // convert to GB
+      : inputs.page_uncached / 1000000; // other assume it's kB, convert GB
 
   // Page load cached (returning visit) (GB)
-  let pageCachedGb = inputs.page_cached / 1000;
+  let pageCachedGb =
+    inputs.plc_unit === "GB"
+      ? inputs.page_cached // per the input, no need to convert to GB
+      : inputs.plc_unit === "MB" // if unit is MB
+      ? inputs.page_cached / 1000 // convert to GB
+      : inputs.page_cached / 1000000; // other assume it's kB, convert GB
 
   // New visitors as a %
   let newVisits = inputs.new_visits / 100;
@@ -96,7 +108,7 @@ export default function RootPage() {
   };
 
   const handleSlider = (value: number[]) => {
-    console.log(value);
+    console.log(value[0]);
     setInputs((values) => ({ ...values, new_visits: value[0] }));
   };
 
@@ -160,41 +172,83 @@ export default function RootPage() {
               </div>
 
               {/* UNCACHED PAGE LOAD */}
-              <div className="mb-2 flex flex-col gap-1">
-                <label
-                  htmlFor="page_load"
-                  className="cursor-pointer text-gray-700"
-                >
-                  Page Load Uncached (MB):
-                </label>
-                <input
-                  id="page_load"
-                  name="page_uncached"
-                  type="number"
-                  min={0}
-                  value={inputs.page_uncached}
-                  onChange={handleChange}
-                  className="w-full rounded-sm border border-gray-500 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
-                />
+              <div className="mb-2 flex gap-2">
+                <div className="flex w-2/3 flex-col gap-1">
+                  <label
+                    htmlFor="page_load"
+                    className="cursor-pointer text-gray-700"
+                  >
+                    Page Load Uncached:
+                  </label>
+                  <input
+                    id="page_load"
+                    name="page_uncached"
+                    type="number"
+                    min={0}
+                    value={inputs.page_uncached}
+                    onChange={handleChange}
+                    className="w-full rounded-sm border border-gray-500 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                  />
+                </div>
+                <div className="flex w-1/3 flex-col gap-1">
+                  <label
+                    htmlFor="plu_unit"
+                    className="cursor-pointer text-gray-700"
+                  >
+                    Units:
+                  </label>
+                  <select
+                    id="plu_unit"
+                    name="plu_unit"
+                    value={inputs.plu_unit}
+                    onChange={handleChange}
+                    className="w-full rounded-sm border border-gray-500 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                  >
+                    <option value="kB">kB</option>
+                    <option value="MB">MB</option>
+                    <option value="GB">GB</option>
+                  </select>
+                </div>
               </div>
 
               {/* CACHED PAGE LOAD */}
-              <div className="mb-2 flex flex-col gap-1">
-                <label
-                  htmlFor="page_load_cached"
-                  className="cursor-pointer text-gray-700"
-                >
-                  Page Load Cached (MB):
-                </label>
-                <input
-                  id="page_load_cached"
-                  name="page_cached"
-                  type="number"
-                  min={0}
-                  value={inputs.page_cached}
-                  onChange={handleChange}
-                  className="w-full rounded-sm border border-gray-500 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
-                />
+              <div className="mb-2 flex gap-2">
+                <div className="flex w-2/3 flex-col gap-1">
+                  <label
+                    htmlFor="page_load_cached"
+                    className="cursor-pointer text-gray-700"
+                  >
+                    Page Load Cached:
+                  </label>
+                  <input
+                    id="page_load_cached"
+                    name="page_cached"
+                    type="number"
+                    min={0}
+                    value={inputs.page_cached}
+                    onChange={handleChange}
+                    className="w-full rounded-sm border border-gray-500 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                  />
+                </div>
+                <div className="flex w-1/3 flex-col gap-1">
+                  <label
+                    htmlFor="plc_unit"
+                    className="cursor-pointer text-gray-700"
+                  >
+                    Units:
+                  </label>
+                  <select
+                    id="plc_unit"
+                    name="plc_unit"
+                    value={inputs.plc_unit}
+                    onChange={handleChange}
+                    className="w-full rounded-sm border border-gray-500 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                  >
+                    <option value="kB">kB</option>
+                    <option value="MB">MB</option>
+                    <option value="GB">GB</option>
+                  </select>
+                </div>
               </div>
 
               {/* % NEW VISTORS */}
