@@ -2,11 +2,21 @@
 
 import * as Collapsible from "@radix-ui/react-collapsible";
 import { Cross2Icon, RowSpacingIcon } from "@radix-ui/react-icons";
+import * as Slider from "@radix-ui/react-slider";
 import { useState } from "react";
 
-const EpGB = 0.5346; // kWh/GB
+const EpGB_SWD = 0.81; // kWh/GB
+const EpGB_SL = 0.5346; // kWh/GB
 const DuPc = 0.788; // Device use %
 const NuPc = 0.212; // Network use %
+
+const EpGB_options = [
+  {
+    label: "Consumer Network and Device Use (" + EpGB_SL + "kWh/GB)",
+    value: EpGB_SL,
+  },
+  { label: "Sustainable Web Design (" + EpGB_SWD + "kWh/GB)", value: EpGB_SWD },
+];
 
 const carbonFactor = [
   { label: "Global Grid (442g/kWh)", value: 442 },
@@ -21,6 +31,7 @@ export default function RootPage() {
     page_cached: 0.1,
     new_visits: 75,
     carbon_factor: carbonFactor[0].value,
+    energy_model: EpGB_options[0].value,
     number_of_visits: 1000,
   });
 
@@ -40,10 +51,11 @@ export default function RootPage() {
   let returningVisits = (100 - inputs.new_visits) / 100;
 
   // Energy use per new visit (kWh)
-  let energyNewVisits = pageUncachedGb * EpGB * newVisits;
+  let energyNewVisits = pageUncachedGb * inputs.energy_model * newVisits;
 
   // Energy use per returning visit (kWh)
-  let energyReturningVisits = pageCachedGb * EpGB * returningVisits;
+  let energyReturningVisits =
+    pageCachedGb * inputs.energy_model * returningVisits;
 
   // Total Energy per visit (kWh)
   let energyPerVisit = energyNewVisits + energyReturningVisits;
@@ -83,6 +95,11 @@ export default function RootPage() {
     setInputs((values) => ({ ...values, [name]: value }));
   };
 
+  const handleSlider = (value: number[]) => {
+    console.log(value);
+    setInputs((values) => ({ ...values, new_visits: value[0] }));
+  };
+
   return (
     <div className="flex min-h-screen flex-col bg-gradient-to-br from-sky-800 from-10% to-emerald-500 to-90%">
       <header className="container mx-auto mt-6 text-white">
@@ -96,80 +113,30 @@ export default function RootPage() {
               noValidate
               onSubmit={(e) => e.preventDefault()}
             >
+              {/* ENERGY METRIC */}
               <div className="mb-2 flex flex-col gap-1">
                 <label
-                  htmlFor="page_load"
+                  htmlFor="energy_model"
                   className="cursor-pointer text-gray-700"
                 >
-                  Page Load Uncached (MB):
+                  Energy Metric Model:
                 </label>
-                <input
-                  id="page_load"
-                  name="page_uncached"
-                  type="number"
-                  min={0}
-                  value={inputs.page_uncached}
+                <select
+                  id="energy_model"
+                  name="energy_model"
+                  value={inputs.energy_model}
                   onChange={handleChange}
                   className="w-full rounded-sm border border-gray-500 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
-                />
-              </div>
-
-              <div className="mb-2 flex flex-col gap-1">
-                <label
-                  htmlFor="page_load_cached"
-                  className="cursor-pointer text-gray-700"
                 >
-                  Page Load Cached (MB):
-                </label>
-                <input
-                  id="page_load_cached"
-                  name="page_cached"
-                  type="number"
-                  min={0}
-                  value={inputs.page_cached}
-                  onChange={handleChange}
-                  className="w-full rounded-sm border border-gray-500 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
-                />
+                  {EpGB_options.map((model) => (
+                    <option key={model.value} value={model.value}>
+                      {model.label}
+                    </option>
+                  ))}
+                </select>
               </div>
 
-              <div className="mb-2 flex flex-col gap-1">
-                <label
-                  htmlFor="new_visits"
-                  className="cursor-pointer text-gray-700"
-                >
-                  New Visits (%):
-                </label>
-                <input
-                  id="new_visits"
-                  type="number"
-                  name="new_visits"
-                  min={5}
-                  max={100}
-                  step={5}
-                  value={inputs.new_visits}
-                  onChange={handleChange}
-                  className="w-full rounded-sm border border-gray-500 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
-                />
-              </div>
-
-              <div className="mb-2 flex flex-col gap-1">
-                <label
-                  htmlFor="nnumber_of_visits"
-                  className="cursor-pointer text-gray-700"
-                >
-                  Number of visits per month:
-                </label>
-                <input
-                  id="number_of_visits"
-                  type="number"
-                  name="number_of_visits"
-                  min={1}
-                  value={inputs.number_of_visits}
-                  onChange={handleChange}
-                  className="w-full rounded-sm border border-gray-500 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
-                />
-              </div>
-
+              {/* CARBON FACTOR */}
               <div className="mb-2 flex flex-col gap-1">
                 <label
                   htmlFor="carbon_factor"
@@ -190,6 +157,112 @@ export default function RootPage() {
                     </option>
                   ))}
                 </select>
+              </div>
+
+              {/* UNCACHED PAGE LOAD */}
+              <div className="mb-2 flex flex-col gap-1">
+                <label
+                  htmlFor="page_load"
+                  className="cursor-pointer text-gray-700"
+                >
+                  Page Load Uncached (MB):
+                </label>
+                <input
+                  id="page_load"
+                  name="page_uncached"
+                  type="number"
+                  min={0}
+                  value={inputs.page_uncached}
+                  onChange={handleChange}
+                  className="w-full rounded-sm border border-gray-500 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                />
+              </div>
+
+              {/* CACHED PAGE LOAD */}
+              <div className="mb-2 flex flex-col gap-1">
+                <label
+                  htmlFor="page_load_cached"
+                  className="cursor-pointer text-gray-700"
+                >
+                  Page Load Cached (MB):
+                </label>
+                <input
+                  id="page_load_cached"
+                  name="page_cached"
+                  type="number"
+                  min={0}
+                  value={inputs.page_cached}
+                  onChange={handleChange}
+                  className="w-full rounded-sm border border-gray-500 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                />
+              </div>
+
+              {/* % NEW VISTORS */}
+              {/* <div className="mb-2 flex flex-col gap-1">
+                <label
+                  htmlFor="new_visits"
+                  className="cursor-pointer text-gray-700"
+                >
+                  New Visits (%):
+                </label>
+                <input
+                  id="new_visits"
+                  type="number"
+                  name="new_visits"
+                  min={5}
+                  max={100}
+                  step={5}
+                  value={inputs.new_visits}
+                  onChange={handleChange}
+                  className="w-full rounded-sm border border-gray-500 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                />
+              </div> */}
+
+              {/* % NEW VISTORS */}
+              <div className="mb-2 flex flex-col gap-1">
+                <label
+                  htmlFor="new_visits"
+                  className="cursor-pointer text-gray-700"
+                >
+                  New Visits (%):
+                </label>
+                <div className="flex items-center gap-4">
+                  <Slider.Root
+                    defaultValue={[75]}
+                    max={100}
+                    min={0}
+                    step={1}
+                    onValueChange={handleSlider}
+                    className="relative flex h-5 w-full touch-none select-none items-center"
+                  >
+                    <Slider.Track className="relative h-1 grow rounded-full bg-gradient-to-l from-sky-800 to-emerald-500">
+                      <Slider.Range className="absolute h-full rounded-full bg-gradient-to-r from-sky-800 to-emerald-500" />
+                    </Slider.Track>
+                    <Slider.Thumb className="block h-5 w-5 rounded-full bg-sky-800 shadow-md hover:cursor-pointer hover:bg-sky-400 focus:shadow-lg focus:outline-none" />
+                  </Slider.Root>
+                  <div className="text-base font-normal">
+                    {inputs.new_visits}%
+                  </div>
+                </div>
+              </div>
+
+              {/* VISITS PER MONTH */}
+              <div className="mb-2 flex flex-col gap-1">
+                <label
+                  htmlFor="nnumber_of_visits"
+                  className="cursor-pointer text-gray-700"
+                >
+                  Number of visits per month:
+                </label>
+                <input
+                  id="number_of_visits"
+                  type="number"
+                  name="number_of_visits"
+                  min={1}
+                  value={inputs.number_of_visits}
+                  onChange={handleChange}
+                  className="w-full rounded-sm border border-gray-500 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                />
               </div>
             </form>
           </div>
