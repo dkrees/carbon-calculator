@@ -292,7 +292,7 @@ export default function RootPage() {
                     <Slider.Track className="relative h-1 grow rounded-full bg-gradient-to-l from-sky-800 to-emerald-500">
                       <Slider.Range className="absolute h-full rounded-full bg-gradient-to-r from-sky-800 to-emerald-500" />
                     </Slider.Track>
-                    <Slider.Thumb className="block h-5 w-5 rounded-full bg-sky-800 shadow-md hover:cursor-pointer hover:bg-sky-400 focus:shadow-lg focus:outline-none" />
+                    <Slider.Thumb className="block h-5 w-5 rounded-full bg-sky-800 shadow-md hover:cursor-pointer hover:bg-primary focus:shadow-lg focus:outline-none" />
                   </Slider.Root>
                   <div className="text-base font-normal">
                     {inputs.new_visits}%
