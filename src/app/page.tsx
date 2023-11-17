@@ -30,11 +30,12 @@ export default function RootPage() {
     page_uncached: 1,
     page_cached: 0.1,
     new_visits: 75,
-    carbon_factor: carbonFactor[0].value,
+    carbon_factor: carbonFactor[1].value,
     energy_model: EpGB_options[0].value,
     number_of_visits: 1000,
     plu_unit: "MB",
     plc_unit: "MB",
+    timeframe: "month",
   });
 
   // Expanding details
@@ -76,7 +77,10 @@ export default function RootPage() {
   let emissionsPerVisit = inputs.carbon_factor * energyPerVisit;
 
   // Monthly emissions (g CO2e)
-  let monthlyEmissions = emissionsPerVisit * inputs.number_of_visits;
+  let monthlyEmissions =
+    inputs.timeframe === "month"
+      ? emissionsPerVisit * inputs.number_of_visits
+      : (emissionsPerVisit * inputs.number_of_visits) / 12;
 
   // Monthly emissions (kg CO2e) with thousand commas
   let monthlyEmissionsKg = numberWithCommas(monthlyEmissions / 1000);
@@ -115,7 +119,7 @@ export default function RootPage() {
   return (
     <div className="flex min-h-screen flex-col bg-gradient-to-br from-sky-800 from-10% to-emerald-500 to-90%">
       <header className="container mx-auto mt-6 text-white">
-        <h1 className="text-4xl">User Interface Carbon Calculator</h1>
+        <h1 className="text-4xl">UI Carbon Calculator</h1>
       </header>
       <div className="container mx-auto mt-6 flex flex-col gap-6 rounded-lg border-2 border-emerald-600 bg-white p-6 font-light">
         <div className="flex gap-6">
@@ -301,22 +305,42 @@ export default function RootPage() {
               </div>
 
               {/* VISITS PER MONTH */}
-              <div className="mb-2 flex flex-col gap-1">
-                <label
-                  htmlFor="nnumber_of_visits"
-                  className="cursor-pointer text-gray-700"
-                >
-                  Number of visits per month:
-                </label>
-                <input
-                  id="number_of_visits"
-                  type="number"
-                  name="number_of_visits"
-                  min={1}
-                  value={inputs.number_of_visits}
-                  onChange={handleChange}
-                  className="w-full rounded-sm border border-gray-500 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
-                />
+              <div className="mb-2 flex gap-2">
+                <div className="flex w-2/3 flex-col gap-1">
+                  <label
+                    htmlFor="nnumber_of_visits"
+                    className="cursor-pointer text-gray-700"
+                  >
+                    Number of visits:
+                  </label>
+                  <input
+                    id="number_of_visits"
+                    type="number"
+                    name="number_of_visits"
+                    min={1}
+                    value={inputs.number_of_visits}
+                    onChange={handleChange}
+                    className="w-full rounded-sm border border-gray-500 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                  />
+                </div>
+                <div className="flex w-1/3 flex-col gap-1">
+                  <label
+                    htmlFor="timeframe"
+                    className="cursor-pointer text-gray-700"
+                  >
+                    per:
+                  </label>
+                  <select
+                    id="timeframe"
+                    name="timeframe"
+                    value={inputs.timeframe}
+                    onChange={handleChange}
+                    className="w-full rounded-sm border border-gray-500 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                  >
+                    <option value="month">Month</option>
+                    <option value="year">Year</option>
+                  </select>
+                </div>
               </div>
             </form>
           </div>
@@ -326,9 +350,22 @@ export default function RootPage() {
               <div className="mt-6 flex flex-col text-center">
                 <div>
                   <span className="text-xl font-medium">
+                    {emissionsPerVisit.toFixed(4)}
+                  </span>{" "}
+                  <span className="text-sm">
+                    g CO<sub>2</sub>e
+                  </span>
+                </div>
+                <span>emissions per visit</span>
+              </div>
+              <div className="mt-6 flex flex-col text-center">
+                <div>
+                  <span className="text-xl font-medium">
                     {monthlyEmissionsKg}
                   </span>{" "}
-                  <span className="text-sm font-light">kg CO2e</span>
+                  <span className="text-sm font-light">
+                    kg CO<sub>2</sub>e
+                  </span>
                 </div>
                 <span>emissions per month</span>
               </div>
@@ -337,7 +374,9 @@ export default function RootPage() {
                   <span className="text-3xl font-medium">
                     {yearlyEmissionsKg}
                   </span>{" "}
-                  <span className="text-lg font-light">kg CO2e</span>
+                  <span className="text-lg font-light">
+                    kg CO<sub>2</sub>e
+                  </span>
                 </div>
                 <span>emissions per year</span>
               </div>
@@ -364,10 +403,21 @@ export default function RootPage() {
 
               <Collapsible.Content>
                 <div className="flex flex-col md:flex-row md:justify-evenly md:gap-12">
+                  {/* <div className="mt-6 flex flex-col text-center">
+                    <div>
+                      <span className="text-lg">
+                        {energyPerVisit.toFixed(4)}
+                      </span>{" "}
+                      <span className="text-sm">kWh</span>
+                    </div>
+                    <span className="text-sm">energy use per visit</span>
+                  </div> */}
                   <div className="mt-6 flex flex-col text-center">
                     <div>
                       <span className="text-lg">{deviceUseMonthlyKg}</span>{" "}
-                      <span className="text-sm">kg CO2e</span>
+                      <span className="text-sm">
+                        kg CO<sub>2</sub>e
+                      </span>
                     </div>
                     <span className="text-sm">
                       device use emissions per month
@@ -376,7 +426,9 @@ export default function RootPage() {
                   <div className="mt-6 flex flex-col text-center">
                     <div className="text-lg">
                       <span className="text-lg">{networkUseMonthlyKg}</span>{" "}
-                      <span className="text-sm">kg CO2e</span>
+                      <span className="text-sm">
+                        kg CO<sub>2</sub>e
+                      </span>
                     </div>
                     <span className="text-sm">
                       network use emissions per month
@@ -384,24 +436,84 @@ export default function RootPage() {
                   </div>
                 </div>
 
-                <div className="flex flex-col md:flex-row md:justify-evenly md:gap-12">
-                  <div className="mt-6 flex flex-col text-center">
-                    <div>
-                      <span className="text-lg">
-                        {energyPerVisit.toFixed(4)}
-                      </span>{" "}
-                      <span className="text-sm">kWh</span>
+                <div className="mt-4">
+                  <h3 className="border-b border-gray-200 text-lg">
+                    Calculations
+                  </h3>
+                  <dl className="">
+                    <dt className="mt-2 text-sm font-light">
+                      Energy per GB transfered:
+                    </dt>
+                    <dd>
+                      E<sub>t</sub> = {inputs.energy_model} kWh/GB
+                    </dd>
+
+                    <dt className="mt-2 text-sm font-light">
+                      Data transfered for new visits (uncached):
+                    </dt>
+                    <dd>
+                      D<sub>n</sub> = {pageUncachedGb} GB
+                    </dd>
+
+                    <dt className="mt-2 text-sm font-light">
+                      Percentage of new visits:
+                    </dt>
+                    <dd>
+                      V<sub>n</sub> = {newVisits}
+                    </dd>
+
+                    <dt className="mt-2 text-sm font-light">
+                      Data transfered for returning vists (cached):
+                    </dt>
+                    <dd>
+                      D<sub>r</sub> = {pageCachedGb} GB
+                    </dd>
+
+                    <dt className="mt-2 text-sm font-light">
+                      Percentage of returning visits:
+                    </dt>
+                    <dd>
+                      V<sub>r</sub> = {returningVisits}
+                    </dd>
+
+                    <dt className="mt-2 text-sm font-light">
+                      Grid carbon factor:
+                    </dt>
+                    <dd>
+                      C<sub>f</sub> = {inputs.carbon_factor} g/kWh
+                    </dd>
+                  </dl>
+                  <div>
+                    <div className="mt-2 text-sm font-light">
+                      Energy used per Visit (E<sub>v</sub> kWh):
                     </div>
-                    <span className="text-sm">energy use per visit</span>
+                    <div className="text-center">
+                      E<sub>v</sub> = (E<sub>t</sub> x D<sub>n</sub> x V
+                      <sub>n</sub>) + (E<sub>t</sub> x D<sub>r</sub> x V
+                      <sub>r</sub>)
+                    </div>
+
+                    <div className="text-center">
+                      E<sub>v</sub> = ({inputs.energy_model} x {pageUncachedGb}{" "}
+                      x {newVisits}) + ({inputs.energy_model} x {pageCachedGb} x{" "}
+                      {returningVisits}) = {energyPerVisit.toFixed(4)} kWh
+                    </div>
                   </div>
-                  <div className="mt-6 flex flex-col text-center">
-                    <div>
-                      <span className="text-lg">
-                        {emissionsPerVisit.toFixed(4)}
-                      </span>{" "}
-                      <span className="text-sm">g CO2e</span>
+                  <div>
+                    <div className="mt-2 text-sm font-light">
+                      Carbon emissions per Visit (C<sub>v</sub> kg CO
+                      <sub>2</sub>):
                     </div>
-                    <span className="text-sm">emissions per visit</span>
+                    <div className="text-center">
+                      C<sub>v</sub> = E<sub>v</sub> x C<sub>f</sub>
+                    </div>
+                    <div>
+                      <div className="text-center">
+                        C<sub>v</sub> = {energyPerVisit.toFixed(4)} x{" "}
+                        {inputs.carbon_factor} = {emissionsPerVisit.toFixed(4)}{" "}
+                        kg CO<sub>2</sub>e
+                      </div>
+                    </div>
                   </div>
                 </div>
               </Collapsible.Content>
